@@ -1,37 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/AuthContext';
 import Sidebar from '../components/Sidebar';
 import GameCard from '../components/GameCard';
-import type { Game } from '../components/GameCard';
+import type { Game } from '../types';
 import { Plus, Gamepad2, TrendingUp, Clock, Zap, Sparkles } from 'lucide-react';
 
 const DEMO_GAMES: Game[] = [
-    {
-        id: 'demo-1',
-        title: 'Neon Racer',
-        prompt: 'A cyberpunk racing game with neon streets and aggressive AI racers',
-        status: 'ready',
-        genre: 'racing',
-        created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-    },
-    {
-        id: 'demo-2',
-        title: 'Space Siege',
-        prompt: 'A first-person shooter in a haunted space station with alien enemies',
-        status: 'ready',
-        genre: 'fps',
-        created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-    },
-    {
-        id: 'demo-3',
-        title: 'Sky Jumper',
-        prompt: 'A colorful 3D platformer with floating islands and collectible stars',
-        status: 'generating',
-        genre: 'platformer',
-        created_at: new Date(Date.now() - 600000).toISOString(),
-    },
+  {
+    id: 'demo-1',
+    title: 'Neon Racer',
+    prompt: 'A cyberpunk racing game with neon streets and aggressive AI racers',
+    status: 'ready',
+    genre: 'racing',
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+    user_id: 'demo-user-1',
+  },
+  {
+    id: 'demo-2',
+    title: 'Space Siege',
+    prompt: 'A first-person shooter in a haunted space station with alien enemies',
+    status: 'ready',
+    genre: 'fps',
+    created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+    user_id: 'demo-user-1',
+  },
+  {
+    id: 'demo-3',
+    title: 'Sky Jumper',
+    prompt: 'A colorful 3D platformer with floating islands and collectible stars',
+    status: 'generating',
+    genre: 'platformer',
+    created_at: new Date(Date.now() - 600000).toISOString(),
+    user_id: 'demo-user-1',
+  },
 ];
 
 const DashboardPage = () => {

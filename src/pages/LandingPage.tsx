@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import PromptInput from '../components/PromptInput';
 import AuthModal from '../components/AuthModal';
 import {
-    Zap, Cpu, MessagesSquare, ArrowRight, Play,
-    Layers, MousePointer2, Sparkles, ChevronRight,
-    Gamepad2, Car, Crosshair, Sword, Puzzle, Star
+    Zap, Star, Car, Crosshair, Puzzle, Sword, ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 

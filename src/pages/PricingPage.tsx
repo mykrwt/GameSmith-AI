@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Check, Zap, Users, Crown } from 'lucide-react';
 
 const PLANS = [
