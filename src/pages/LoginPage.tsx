@@ -205,9 +205,9 @@ const LoginPage = () => {
 
                 <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: 'var(--color-text-3)' }}>
                     By continuing, you agree to our{' '}
-                    <a href="#" style={{ color: 'var(--color-text-2)', textDecoration: 'underline' }}>Terms</a>
+                    <a href="/terms" style={{ color: 'var(--color-text-2)', textDecoration: 'underline' }}>Terms</a>
                     {' '}and{' '}
-                    <a href="#" style={{ color: 'var(--color-text-2)', textDecoration: 'underline' }}>Privacy Policy</a>
+                    <a href="/privacy" style={{ color: 'var(--color-text-2)', textDecoration: 'underline' }}>Privacy Policy</a>
                 </p>
             </div>
         </div>

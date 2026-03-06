@@ -100,9 +100,9 @@ const DashboardPage = () => {
                     marginBottom: '40px',
                 }}>
                     {[
-                        { icon: <Gamepad2 size={20} style={{ color: '#a78bfa' }} />, label: 'Total Games', value: games.length, color: '#a78bfa' },
+                        { icon: <Gamepad2 size={20} style={{ color: '#D4AF37' }} />, label: 'Total Games', value: games.length, color: '#D4AF37' },
                         { icon: <TrendingUp size={20} style={{ color: '#4ade80' }} />, label: 'Ready to Play', value: readyCount, color: '#4ade80' },
-                        { icon: <Clock size={20} style={{ color: '#fb923c' }} />, label: 'Generating', value: generatingCount, color: '#fb923c' },
+                        { icon: <Clock size={20} style={{ color: '#D4AF37' }} />, label: 'Generating', value: generatingCount, color: '#D4AF37' },
                     ].map((stat, i) => (
                         <div key={i} className="card" style={{
                             display: 'flex', alignItems: 'center', gap: '16px',
@@ -134,19 +134,19 @@ const DashboardPage = () => {
                         marginBottom: '40px',
                         padding: '28px',
                         borderRadius: '20px',
-                        background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(219,39,119,0.08) 100%)',
-                        border: '1px dashed rgba(124,58,237,0.35)',
+                        background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(192,192,192,0.08) 100%)',
+                        border: '1px dashed rgba(212,175,55,0.35)',
                         cursor: 'pointer',
                         display: 'flex', alignItems: 'center', gap: '20px',
                         transition: 'all 0.2s',
                     }}
                     onMouseEnter={e => {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(219,39,119,0.12) 100%)';
-                        e.currentTarget.style.borderColor = 'rgba(124,58,237,0.5)';
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(192,192,192,0.12) 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(212,175,55,0.5)';
                     }}
                     onMouseLeave={e => {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(219,39,119,0.08) 100%)';
-                        e.currentTarget.style.borderColor = 'rgba(124,58,237,0.35)';
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(192,192,192,0.08) 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(212,175,55,0.35)';
                     }}
                 >
                     <div style={{
@@ -154,7 +154,7 @@ const DashboardPage = () => {
                         background: 'var(--gradient-brand)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         flexShrink: 0,
-                        boxShadow: '0 4px 20px rgba(124,58,237,0.4)',
+                        boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
                     }}>
                         <Plus size={24} color="white" />
                     </div>
@@ -165,7 +165,7 @@ const DashboardPage = () => {
                         </p>
                     </div>
                     <div style={{ marginLeft: 'auto' }}>
-                        <Sparkles size={20} style={{ color: '#c4b5fd' }} />
+                        <Sparkles size={20} style={{ color: '#D4AF37' }} />
                     </div>
                 </div>
 

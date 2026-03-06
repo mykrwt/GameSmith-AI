@@ -20,6 +20,7 @@ export interface UserProfile {
   email: string;
   avatar_url?: string;
   full_name?: string;
+  isAdmin?: boolean;
 }
 
 // Generation Types
@@ -34,7 +35,7 @@ export type GenerationPhase = 'input' | 'generating' | 'done';
 // Chat Types
 export interface ChatMessage {
   role: 'user' | 'ai';
-  text: string;
+  text: string | React.ReactNode;
   timestamp?: string;
 }
 
