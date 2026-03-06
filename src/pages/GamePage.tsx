@@ -1,55 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../lib/AuthContext';
 import { supabase } from '../lib/supabase';
 import Sidebar from '../components/Sidebar';
 import StatusBadge from '../components/StatusBadge';
-import type { Game } from '../components/GameCard';
+import type { Game, ChatMessage } from '../types';
 import { ArrowLeft, Edit3, Share2, Trash2, ArrowUp, Clock, Gamepad2 } from 'lucide-react';
 
 const GamePage = () => {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const [game, setGame] = useState<Game | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [chatInput, setChatInput] = useState('');
-    const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
-        { role: 'ai', text: '👋 Hi! I\'m your game editor AI. Ask me to change anything — mechanics, colors, difficulty, level layout — and I\'ll update the game for you.' },
-    ]);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [game, setGame] = useState<Game | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: 'ai', text: '👋 Hi! I\'m your game editor AI. Ask me to change anything — mechanics, colors, difficulty, level layout — and I\'ll update the game for you.' },
+  ]);
 
-    const DEMO_GAME: Game = {
-        id: id || 'demo',
-        title: 'Neon Racer',
-        prompt: 'A cyberpunk racing game with neon streets and aggressive AI racers',
-        status: 'ready',
-        genre: 'racing',
-        created_at: new Date().toISOString(),
+  const DEMO_GAME: Game = {
+    id: id || 'demo',
+    title: 'Neon Racer',
+    prompt: 'A cyberpunk racing game with neon streets and aggressive AI racers',
+    status: 'ready',
+    genre: 'racing',
+    created_at: new Date().toISOString(),
+    user_id: 'demo-user-1',
+  };
+
+  useEffect(() => {
+    const fetchGame = async () => {
+      if (!id || id.startsWith('demo')) {
+        setGame(DEMO_GAME);
+        setLoading(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from('games')
+          .select('*')
+          .eq('id', id)
+          .single();
+        if (!error && data) setGame(data);
+        else setGame(DEMO_GAME);
+      } catch {
+        setGame(DEMO_GAME);
+      } finally {
+        setLoading(false);
+      }
     };
-
-    useEffect(() => {
-        const fetchGame = async () => {
-            if (!id || id.startsWith('demo')) {
-                setGame(DEMO_GAME);
-                setLoading(false);
-                return;
-            }
-            try {
-                const { data, error } = await supabase
-                    .from('games')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-                if (!error && data) setGame(data);
-                else setGame(DEMO_GAME);
-            } catch {
-                setGame(DEMO_GAME);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchGame();
-    }, [id]);
+    fetchGame();
+  }, [id]);
 
     const sendChat = () => {
         if (!chatInput.trim()) return;

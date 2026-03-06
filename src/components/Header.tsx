@@ -4,10 +4,15 @@ import { useState } from 'react';
 import { Gamepad2, ChevronDown, LayoutDashboard, Plus, LogOut, User } from 'lucide-react';
 
 const Header = () => {
-    const { user, signOut } = useAuth();
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const location = useLocation();
-    const isDashboard = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/build') || location.pathname.startsWith('/game');
+  const { user, signOut } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/build') || location.pathname.startsWith('/game');
+
+  const handleSignOut = async () => {
+    await signOut();
+    setDropdownOpen(false);
+  };
 
     return (
         <header style={{
@@ -141,7 +146,7 @@ const Header = () => {
                                             >
                                                 <User size={15} /> Profile
                                             </Link>
-                                            <button onClick={() => { signOut(); setDropdownOpen(false); }} style={{
+                                            <button onClick={handleSignOut} style={{
                                                 display: 'flex', alignItems: 'center', gap: '10px',
                                                 padding: '10px 12px', borderRadius: '8px',
                                                 background: 'none', border: 'none',

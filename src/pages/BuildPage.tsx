@@ -1,207 +1,208 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { supabase } from '../lib/supabase';
 import Sidebar from '../components/Sidebar';
 import GenerationProgress from '../components/GenerationProgress';
 import PromptInput from '../components/PromptInput';
+import type { GenerationStep, GenerationPhase } from '../types';
 import {
-    Zap, Car, Crosshair, Puzzle, Sword,
-    ArrowLeft, Gamepad2, ChevronRight
+  Zap, Car, Crosshair, Puzzle, Sword,
+  ArrowLeft, Gamepad2, ChevronRight
 } from 'lucide-react';
 
-const GENERATION_STEPS = [
-    { id: 'parse', label: 'Parsing Prompt', description: 'Analyzing your description to extract game genre, mechanics, and visual style.' },
-    { id: 'template', label: 'Selecting Template', description: 'Choosing the best base game template that matches your requirements.' },
-    { id: 'assets', label: 'Generating Assets', description: 'Creating 3D models, textures, terrain, lighting, and audio configuration.' },
-    { id: 'scene', label: 'Assembling Scene', description: 'Placing objects, configuring physics, setting up player spawn points and logic.' },
-    { id: 'compile', label: 'Finalizing Game', description: 'Compiling all systems, running validation checks, and preparing for playback.' },
+const GENERATION_STEPS: GenerationStep[] = [
+  { id: 'parse', label: 'Parsing Prompt', description: 'Analyzing your description to extract game genre, mechanics, and visual style.' },
+  { id: 'template', label: 'Selecting Template', description: 'Choosing the best base game template that matches your requirements.' },
+  { id: 'assets', label: 'Generating Assets', description: 'Creating 3D models, textures, terrain, lighting, and audio configuration.' },
+  { id: 'scene', label: 'Assembling Scene', description: 'Placing objects, configuring physics, setting up player spawn points and logic.' },
+  { id: 'compile', label: 'Finalizing Game', description: 'Compiling all systems, running validation checks, and preparing for playback.' },
 ];
 
 const GENRES = [
-    { icon: <Car size={15} />, label: 'Racing', prompt: 'A high-speed racing game with realistic physics and neon tracks' },
-    { icon: <Crosshair size={15} />, label: 'FPS', prompt: 'A first-person shooter in a futuristic abandoned space station' },
-    { icon: <Zap size={15} />, label: 'Platformer', prompt: 'A colorful 3D platformer with floating islands and collectibles' },
-    { icon: <Puzzle size={15} />, label: 'Puzzle', prompt: 'A gravity-based 3D puzzle game with mind-bending mechanics' },
-    { icon: <Sword size={15} />, label: 'RPG', prompt: 'An action RPG with inventory, enemies, and skill progression' },
+  { icon: <Car size={15} />, label: 'Racing', prompt: 'A high-speed racing game with realistic physics and neon tracks' },
+  { icon: <Crosshair size={15} />, label: 'FPS', prompt: 'A first-person shooter in a futuristic abandoned space station' },
+  { icon: <Zap size={15} />, label: 'Platformer', prompt: 'A colorful 3D platformer with floating islands and collectibles' },
+  { icon: <Puzzle size={15} />, label: 'Puzzle', prompt: 'A gravity-based 3D puzzle game with mind-bending mechanics' },
+  { icon: <Sword size={15} />, label: 'RPG', prompt: 'An action RPG with inventory, enemies, and skill progression' },
 ];
 
 const STEP_DURATIONS = [2000, 1500, 3000, 2500, 1500]; // ms per step
 
-type Phase = 'input' | 'generating' | 'done';
-
 const BuildPage = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-    const [phase, setPhase] = useState<Phase>('input');
-    const [prompt, setPrompt] = useState((location.state as any)?.prompt || '');
-    const [currentStep, setCurrentStep] = useState(0);
-    const [gameId, setGameId] = useState<string | null>(null);
-    const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([]);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const threeRef = useRef<any>(null);
+  const [phase, setPhase] = useState<GenerationPhase>('input');
+  const [prompt, setPrompt] = useState((location.state as any)?.prompt || '');
+  const [currentStep, setCurrentStep] = useState(0);
+  const [gameId, setGameId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const threeRef = useRef<{ cancel: () => void } | null>(null);
 
-    // Simulate generation pipeline
-    const startGeneration = async () => {
-        if (!prompt.trim()) return;
-        setPhase('generating');
-        setMessages(prev => [...prev, { role: 'user', text: prompt }]);
-        setCurrentStep(0);
+  // Simulate generation pipeline
+  const startGeneration = async () => {
+    if (!prompt.trim()) return;
+    setPhase('generating');
+    setMessages(prev => [...prev, { role: 'user', text: prompt }]);
+    setCurrentStep(0);
 
-        // Detect genre
-        const genreMatch = GENRES.find(g => prompt.toLowerCase().includes(g.label.toLowerCase()));
-        const genre = genreMatch?.label.toLowerCase() || 'other';
+    // Detect genre
+    const genreMatch = GENRES.find(g => prompt.toLowerCase().includes(g.label.toLowerCase()));
+    const genre = genreMatch?.label.toLowerCase() || 'other';
 
-        // Derive title from prompt
-        const title = prompt
-            .split(' ')
-            .slice(0, 4)
-            .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(' ');
+    // Derive title from prompt
+    const title = prompt
+      .split(' ')
+      .slice(0, 4)
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
 
-        // Save to Supabase
-        let savedId: string | null = null;
-        try {
-            const { data, error } = await supabase
-                .from('games')
-                .insert([{ user_id: user!.id, title, prompt, status: 'generating', genre }])
-                .select()
-                .single();
-            if (!error && data) savedId = data.id;
-        } catch (_) { /* offline mode */ }
+    // Save to Supabase
+    let savedId: string | null = null;
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .insert([{ user_id: user!.id, title, prompt, status: 'generating', genre }])
+        .select()
+        .single();
+      if (!error && data) savedId = data.id;
+    } catch (_) { /* offline mode */ }
 
-        // Step through pipeline
-        for (let i = 0; i < GENERATION_STEPS.length; i++) {
-            setCurrentStep(i);
-            await new Promise(res => setTimeout(res, STEP_DURATIONS[i]));
-        }
+    // Step through pipeline
+    for (let i = 0; i < GENERATION_STEPS.length; i++) {
+      setCurrentStep(i);
+      await new Promise(res => setTimeout(res, STEP_DURATIONS[i]));
+    }
 
-        // Mark done
-        if (savedId) {
-            setGameId(savedId);
-            await supabase.from('games').update({ status: 'ready' }).eq('id', savedId);
-        } else {
-            setGameId('demo-' + Date.now());
-        }
+    // Mark done
+    if (savedId) {
+      setGameId(savedId);
+      await supabase.from('games').update({ status: 'ready' }).eq('id', savedId);
+    } else {
+      setGameId('demo-' + Date.now());
+    }
 
-        setMessages(prev => [...prev, {
-            role: 'ai',
-            text: `✅ Your game "${title}" is ready! I've built a complete ${genre} game with all mechanics in place. You can play it now or ask me to make changes.`,
-        }]);
-        setPhase('done');
+    setMessages(prev => [...prev, {
+      role: 'ai',
+      text: `✅ Your game "${title}" is ready! I've built a complete ${genre} game with all mechanics in place. You can play it now or ask me to make changes.`,
+    }]);
+    setPhase('done');
+  };
+
+  // Three.js placeholder game preview
+  useEffect(() => {
+    if (phase !== 'done' || !canvasRef.current) return;
+
+    let animId: number;
+    const canvas = canvasRef.current;
+    const gl = canvas.getContext('webgl');
+    if (!gl) return;
+
+    // Simple WebGL spinning cube
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
+
+    const vsSource = `
+      attribute vec4 aVertexPosition;
+      attribute vec4 aVertexColor;
+      uniform mat4 uModelViewMatrix;
+      uniform mat4 uProjectionMatrix;
+      varying lowp vec4 vColor;
+      void main() {
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+        vColor = aVertexColor;
+      }
+    `;
+    const fsSource = `
+      varying lowp vec4 vColor;
+      void main() { gl_FragColor = vColor; }
+    `;
+
+    const compileShader = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
     };
+    const prog = gl.createProgram()!;
+    gl.attachShader(prog, compileShader(gl.VERTEX_SHADER, vsSource));
+    gl.attachShader(prog, compileShader(gl.FRAGMENT_SHADER, fsSource));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
 
-    // Three.js placeholder game preview
-    useEffect(() => {
-        if (phase !== 'done' || !canvasRef.current) return;
+    const positions = new Float32Array([
+      -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1,
+      -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1,
+      -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1,
+      -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1,
+      1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1,
+      -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1,
+    ]);
+    const cols = [
+      [0.49, 0.22, 0.93, 1], [0.86, 0.15, 0.49, 1],
+      [0.98, 0.45, 0.09, 1], [0.13, 0.77, 0.37, 1],
+      [0.24, 0.63, 0.98, 1], [0.94, 0.37, 0.47, 1],
+    ];
+    const colors: number[] = [];
+    cols.forEach(c => { for (let i = 0; i < 4; i++) colors.push(...c); });
 
-        let animId: number;
-        const canvas = canvasRef.current;
-        const gl = canvas.getContext('webgl');
-        if (!gl) return;
+    const posBuffer = gl.createBuffer()!;
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    const posLoc = gl.getAttribLocation(prog, 'aVertexPosition');
+    gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(posLoc);
 
-        // Simple WebGL spinning cube
-        const w = canvas.clientWidth;
-        const h = canvas.clientHeight;
-        canvas.width = w;
-        canvas.height = h;
-        gl.viewport(0, 0, w, h);
+    const colBuffer = gl.createBuffer()!;
+    gl.bindBuffer(gl.ARRAY_BUFFER, colBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+    const colLoc = gl.getAttribLocation(prog, 'aVertexColor');
+    gl.vertexAttribPointer(colLoc, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(colLoc);
 
-        const vsSource = `
-            attribute vec4 aVertexPosition;
-            attribute vec4 aVertexColor;
-            uniform mat4 uModelViewMatrix;
-            uniform mat4 uProjectionMatrix;
-            varying lowp vec4 vColor;
-            void main() {
-                gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-                vColor = aVertexColor;
-            }
-        `;
-        const fsSource = `
-            varying lowp vec4 vColor;
-            void main() { gl_FragColor = vColor; }
-        `;
+    const indices = new Uint16Array([
+      0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
+      12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23,
+    ]);
+    const idxBuffer = gl.createBuffer()!;
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idxBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-        const compileShader = (type: number, src: string) => {
-            const s = gl.createShader(type)!;
-            gl.shaderSource(s, src); gl.compileShader(s); return s;
-        };
-        const prog = gl.createProgram()!;
-        gl.attachShader(prog, compileShader(gl.VERTEX_SHADER, vsSource));
-        gl.attachShader(prog, compileShader(gl.FRAGMENT_SHADER, fsSource));
-        gl.linkProgram(prog);
-        gl.useProgram(prog);
+    const proj = new Float32Array([
+      1.8, 0, 0, 0, 0, 1.8, 0, 0, 0, 0, -1.01, -1, 0, 0, -0.2, 0,
+    ]);
+    gl.uniformMatrix4fv(gl.getUniformLocation(prog, 'uProjectionMatrix'), false, proj);
 
-        const positions = new Float32Array([
-            -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1,
-            -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1,
-            -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1,
-            -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1,
-            1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1,
-            -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1,
-        ]);
-        const cols = [
-            [0.49, 0.22, 0.93, 1], [0.86, 0.15, 0.49, 1],
-            [0.98, 0.45, 0.09, 1], [0.13, 0.77, 0.37, 1],
-            [0.24, 0.63, 0.98, 1], [0.94, 0.37, 0.47, 1],
-        ];
-        const colors: number[] = [];
-        cols.forEach(c => { for (let i = 0; i < 4; i++) colors.push(...c); });
+    gl.enable(gl.DEPTH_TEST);
+    let angle = 0;
 
-        const posBuffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-        const posLoc = gl.getAttribLocation(prog, 'aVertexPosition');
-        gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(posLoc);
+    const render = () => {
+      angle += 0.01;
+      gl.clearColor(0.03, 0.03, 0.08, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        const colBuffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, colBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        const colLoc = gl.getAttribLocation(prog, 'aVertexColor');
-        gl.vertexAttribPointer(colLoc, 4, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(colLoc);
-
-        const indices = new Uint16Array([
-            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
-            12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23,
-        ]);
-        const idxBuffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idxBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-        const proj = new Float32Array([
-            1.8, 0, 0, 0, 0, 1.8, 0, 0, 0, 0, -1.01, -1, 0, 0, -0.2, 0,
-        ]);
-        gl.uniformMatrix4fv(gl.getUniformLocation(prog, 'uProjectionMatrix'), false, proj);
-
-        gl.enable(gl.DEPTH_TEST);
-        let angle = 0;
-
-        const render = () => {
-            angle += 0.01;
-            gl.clearColor(0.03, 0.03, 0.08, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-            const c = Math.cos(angle), s = Math.sin(angle);
-            const c2 = Math.cos(angle * 0.6), s2 = Math.sin(angle * 0.6);
-            const mv = new Float32Array([
-                c, s * s2, s * c2, 0,
-                0, c2, -s2, 0,
-                -s, c * s2, c * c2, 0,
-                0, 0, -5, 1,
-            ]);
-            gl.uniformMatrix4fv(gl.getUniformLocation(prog, 'uModelViewMatrix'), false, mv);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-            animId = requestAnimationFrame(render);
-        };
-        render();
-        threeRef.current = { cancel: () => cancelAnimationFrame(animId) };
-        return () => cancelAnimationFrame(animId);
-    }, [phase]);
+      const c = Math.cos(angle), s = Math.sin(angle);
+      const c2 = Math.cos(angle * 0.6), s2 = Math.sin(angle * 0.6);
+      const mv = new Float32Array([
+        c, s * s2, s * c2, 0,
+        0, c2, -s2, 0,
+        -s, c * s2, c * c2, 0,
+        0, 0, -5, 1,
+      ]);
+      gl.uniformMatrix4fv(gl.getUniformLocation(prog, 'uModelViewMatrix'), false, mv);
+      gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+      animId = requestAnimationFrame(render);
+    };
+    render();
+    threeRef.current = { cancel: () => cancelAnimationFrame(animId) };
+    return () => cancelAnimationFrame(animId);
+  }, [phase]);
 
     return (
         <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
