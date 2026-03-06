@@ -2,10 +2,13 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Session, User, AuthError } from '@supabase/supabase-js';
 
+const ADMIN_EMAIL = 'mayanksinghrawat.ldh@gmail.com';
+
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  isAdmin: boolean;
   signOut: () => Promise<{ error: AuthError | null }>;
 }
 
@@ -15,6 +18,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   useEffect(() => {
     let mounted = true;
@@ -69,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     user,
     loading,
+    isAdmin,
     signOut,
   };
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PromptInput from '../components/PromptInput';
 import AuthModal from '../components/AuthModal';
 import {
-    Zap, Star, Car, Crosshair, Puzzle, Sword, ChevronRight
+    Zap, Star, Car, Crosshair, Puzzle, Sword, ChevronRight, Gamepad2, PencilLine
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 
@@ -17,22 +17,22 @@ const GENRES = [
 
 const FEATURES = [
     {
-        icon: '⚡',
+        icon: <Zap size={28} />,
         title: 'Instant Generation',
         desc: 'Type a prompt and watch your game come alive in seconds. Our AI pipeline handles scene creation, physics, and logic automatically.',
-        color: '#f97316',
+        color: '#D4AF37',
     },
     {
-        icon: '🎮',
+        icon: <Gamepad2 size={28} />,
         title: 'Full 3D Engine',
         desc: 'Built on a battle-tested WebGL engine with real-time lighting, physics simulation, collision detection, and audio support.',
-        color: '#7c3aed',
+        color: '#D4AF37',
     },
     {
-        icon: '✏️',
+        icon: <PencilLine size={28} />,
         title: 'Iterate with Chat',
         desc: 'Not happy with a result? Chat with the AI to refine your game. Change colors, mechanics, levels — all through conversation.',
-        color: '#ec4899',
+        color: '#C0C0C0',
     },
 ];
 
@@ -213,7 +213,8 @@ const LandingPage = () => {
                                 width: '52px', height: '52px', borderRadius: '14px',
                                 background: `${f.color}20`, border: `1px solid ${f.color}40`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '24px', marginBottom: '20px',
+                                color: f.color,
+                                marginBottom: '20px',
                             }}>
                                 {f.icon}
                             </div>
@@ -382,15 +383,19 @@ const LandingPage = () => {
                         © 2026 GameSmith AI. All rights reserved.
                     </p>
                     <div style={{ display: 'flex', gap: '24px' }}>
-                        {['Privacy', 'Terms', 'Docs'].map(l => (
-                            <a key={l} href="#" style={{
+                        {[
+                            { label: 'Privacy', path: '/privacy' },
+                            { label: 'Terms', path: '/terms' },
+                            { label: 'Docs', path: '#' },
+                        ].map(l => (
+                            <a key={l.label} href={l.path} style={{
                                 color: 'var(--color-text-3)', fontSize: '14px',
                                 textDecoration: 'none', transition: 'color 0.15s',
                             }}
                                 onMouseEnter={e => (e.currentTarget.style.color = 'white')}
                                 onMouseLeave={e => (e.currentTarget.style.color = 'var(--color-text-3)')}
                             >
-                                {l}
+                                {l.label}
                             </a>
                         ))}
                     </div>

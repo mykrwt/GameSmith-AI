@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { useState } from 'react';
-import { Gamepad2, ChevronDown, LayoutDashboard, Plus, LogOut, User } from 'lucide-react';
+import { Gamepad2, ChevronDown, LayoutDashboard, Plus, LogOut, User, Shield } from 'lucide-react';
 
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
   const isDashboard = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/build') || location.pathname.startsWith('/game');
@@ -133,6 +133,12 @@ const Header = () => {
                                             <p style={{ fontSize: '13px', color: 'var(--color-text)', margin: 0, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                 {user.email}
                                             </p>
+                                            {isAdmin && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px' }}>
+                                                    <Shield size={12} style={{ color: '#D4AF37' }} />
+                                                    <span style={{ fontSize: '11px', color: '#D4AF37', fontWeight: 600 }}>Admin</span>
+                                                </div>
+                                            )}
                                         </div>
                                         <div style={{ padding: '8px' }}>
                                             <Link to="/dashboard" onClick={() => setDropdownOpen(false)} style={{

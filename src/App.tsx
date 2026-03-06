@@ -10,6 +10,8 @@ import DashboardPage from './pages/DashboardPage';
 import BuildPage from './pages/BuildPage';
 import GamePage from './pages/GamePage';
 import PricingPage from './pages/PricingPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 function AppRoutes() {
     return (
@@ -30,6 +32,16 @@ function AppRoutes() {
                 <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
                     <Header />
                     <PricingPage />
+                </div>
+            } />
+            <Route path="/terms" element={
+                <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
+                    <TermsPage />
+                </div>
+            } />
+            <Route path="/privacy" element={
+                <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
+                    <PrivacyPage />
                 </div>
             } />
 

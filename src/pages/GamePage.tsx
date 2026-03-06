@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import Sidebar from '../components/Sidebar';
 import StatusBadge from '../components/StatusBadge';
 import type { Game, ChatMessage } from '../types';
-import { ArrowLeft, Edit3, Share2, Trash2, ArrowUp, Clock, Gamepad2 } from 'lucide-react';
+import { ArrowLeft, Edit3, Share2, Trash2, ArrowUp, Clock, Gamepad2, Hand, Sparkles } from 'lucide-react';
 
 const GamePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +13,7 @@ const GamePage = () => {
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'ai', text: '👋 Hi! I\'m your game editor AI. Ask me to change anything — mechanics, colors, difficulty, level layout — and I\'ll update the game for you.' },
+    { role: 'ai', text: <><Hand size={18} style={{ marginRight: '4px' }} /> Hi! I'm your game editor AI. Ask me to change anything — mechanics, colors, difficulty, level layout — and I'll update the game for you.</> },
   ]);
 
   const DEMO_GAME: Game = {
@@ -58,7 +58,7 @@ const GamePage = () => {
         setTimeout(() => {
             setMessages(prev => [...prev, {
                 role: 'ai',
-                text: `Got it! I'm updating your game to "${userMsg.toLowerCase()}". Changes will apply in a few moments. ✨`,
+                text: <><Sparkles size={16} style={{ marginRight: '4px' }} /> Got it! I'm updating your game to "{userMsg.toLowerCase()}". Changes will apply in a few moments.</>,
             }]);
         }, 1200);
     };
@@ -203,7 +203,7 @@ const GamePage = () => {
                                         fontSize: '13px', lineHeight: 1.55,
                                         animation: 'fadeInUp 0.25s ease',
                                     }}>
-                                        {msg.text}
+                                        {typeof msg.text === 'string' ? msg.text : msg.text}
                                     </div>
                                 </div>
                             ))}

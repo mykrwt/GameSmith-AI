@@ -145,9 +145,9 @@ const BuildPage = () => {
       -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1,
     ]);
     const cols = [
-      [0.49, 0.22, 0.93, 1], [0.86, 0.15, 0.49, 1],
-      [0.98, 0.45, 0.09, 1], [0.13, 0.77, 0.37, 1],
-      [0.24, 0.63, 0.98, 1], [0.94, 0.37, 0.47, 1],
+      [0.83, 0.69, 0.22, 1], [0.75, 0.63, 0.2, 1],
+      [0.96, 0.96, 0.96, 1], [0.85, 0.85, 0.85, 1],
+      [0.7, 0.58, 0.18, 1], [0.6, 0.5, 0.16, 1],
     ];
     const colors: number[] = [];
     cols.forEach(c => { for (let i = 0; i < 4; i++) colors.push(...c); });
@@ -280,9 +280,9 @@ const BuildPage = () => {
                                             style={{
                                                 display: 'flex', alignItems: 'center', gap: '12px',
                                                 padding: '12px 16px', borderRadius: '12px',
-                                                border: `1px solid ${prompt === g.prompt ? 'rgba(124,58,237,0.5)' : 'var(--color-border)'}`,
-                                                background: prompt === g.prompt ? 'rgba(124,58,237,0.12)' : 'var(--color-surface)',
-                                                color: prompt === g.prompt ? '#c4b5fd' : 'var(--color-text-2)',
+                                                border: `1px solid ${prompt === g.prompt ? 'rgba(212,175,55,0.5)' : 'var(--color-border)'}`,
+                                                background: prompt === g.prompt ? 'rgba(212,175,55,0.12)' : 'var(--color-surface)',
+                                                color: prompt === g.prompt ? '#D4AF37' : 'var(--color-text-2)',
                                                 cursor: 'pointer', textAlign: 'left',
                                                 fontSize: '14px', transition: 'all 0.15s',
                                             }}
@@ -329,7 +329,7 @@ const BuildPage = () => {
                                             maxWidth: '85%', padding: '12px 16px',
                                             borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                                             background: msg.role === 'user'
-                                                ? 'linear-gradient(135deg, #7c3aed, #db2777)'
+                                                ? 'linear-gradient(135deg, #D4AF37, #C0C0C0)'
                                                 : 'var(--color-surface)',
                                             border: msg.role !== 'user' ? '1px solid var(--color-border)' : 'none',
                                             fontSize: '14px', lineHeight: 1.6,
@@ -369,12 +369,12 @@ const BuildPage = () => {
                             <div style={{ textAlign: 'center', maxWidth: '480px' }}>
                                 <div className="animate-float" style={{
                                     width: '120px', height: '120px', borderRadius: '28px',
-                                    background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(219,39,119,0.2))',
-                                    border: '1px solid rgba(124,58,237,0.3)',
+                                    background: 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(192,192,192,0.2))',
+                                    border: '1px solid rgba(212,175,55,0.3)',
                                     margin: '0 auto 32px',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
-                                    <Gamepad2 size={52} style={{ color: '#c4b5fd' }} />
+                                    <Gamepad2 size={52} style={{ color: '#D4AF37' }} />
                                 </div>
                                 <h3 style={{ fontSize: '28px', margin: '0 0 12px', fontFamily: 'Space Grotesk', letterSpacing: '-0.03em' }}>
                                     Ready to build
@@ -398,12 +398,12 @@ const BuildPage = () => {
                                 <div style={{ marginBottom: '32px' }}>
                                     <div className="animate-pulse-glow" style={{
                                         width: '64px', height: '64px', borderRadius: '18px',
-                                        background: 'linear-gradient(135deg, rgba(124,58,237,0.4), rgba(219,39,119,0.3))',
-                                        border: '1px solid rgba(124,58,237,0.4)',
+                                        background: 'linear-gradient(135deg, rgba(212,175,55,0.4), rgba(192,192,192,0.3))',
+                                        border: '1px solid rgba(212,175,55,0.4)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         marginBottom: '20px',
                                     }}>
-                                        <Zap size={28} style={{ color: '#c4b5fd' }} />
+                                        <Zap size={28} style={{ color: '#D4AF37' }} />
                                     </div>
                                     <h3 style={{ fontSize: '22px', margin: '0 0 4px', fontFamily: 'Space Grotesk' }}>
                                         Building your game

@@ -34,7 +34,7 @@ const GenerationProgress: React.FC<GenerationProgressProps> = ({ currentStep, st
                 <span style={{
                   fontSize: '14px', fontWeight: 600,
                   color: status === 'pending' ? 'var(--color-text-3)' :
-                    status === 'active' ? '#c4b5fd' : '#4ade80',
+                    status === 'active' ? '#D4AF37' : '#4ade80',
                 }}>
                   {step.label}
                 </span>

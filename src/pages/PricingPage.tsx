@@ -8,7 +8,7 @@ const PLANS = [
         period: '',
         description: 'Perfect for trying out AI game generation',
         icon: <Zap size={22} />,
-        color: '#6b7280',
+        color: '#808080',
         features: [
             '3 games per month',
             'Basic templates (Racing, FPS)',
@@ -25,7 +25,7 @@ const PLANS = [
         period: '/mo',
         description: 'For serious indie creators and game designers',
         icon: <Crown size={22} />,
-        color: '#7c3aed',
+        color: '#D4AF37',
         popular: true,
         features: [
             'Unlimited games',
@@ -45,7 +45,7 @@ const PLANS = [
         period: '/mo',
         description: 'For studios and collaborative teams',
         icon: <Users size={22} />,
-        color: '#ec4899',
+        color: '#C0C0C0',
         features: [
             'Everything in Pro',
             'Up to 10 team members',

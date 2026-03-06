@@ -9,12 +9,12 @@ interface GameCardProps {
 }
 
 const genreColors: Record<GameGenre, string> = {
-  racing: '#f97316',
-  fps: '#ef4444',
-  platformer: '#22c55e',
-  puzzle: '#3b82f6',
-  rpg: '#a855f7',
-  other: '#6b7280',
+  racing: '#D4AF37',
+  fps: '#C0C0C0',
+  platformer: '#D4AF37',
+  puzzle: '#C0C0C0',
+  rpg: '#D4AF37',
+  other: '#808080',
 };
 
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
